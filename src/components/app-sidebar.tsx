@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useCartStore } from "@/store/cart-store"
 
-// Datos para TechStore E-commerce
+
 const data = {
   user: {
     name: "Marcos Reynoso",

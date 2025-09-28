@@ -14,13 +14,12 @@ interface CartState {
     totalItems: number
     totalPrice: number
 
-    // Actions
     addItem: (product: Omit<CartItem, 'quantity'>) => void
     removeItem: (id: string) => void
     updateQuantity: (id: string, quantity: number) => void
     clearCart: () => void
 
-    // Getters
+
     getItem: (id: string) => CartItem | undefined
 }
 
