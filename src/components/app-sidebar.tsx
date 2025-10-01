@@ -33,7 +33,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useCartStore } from "@/store/cart-store"
-
+import Link from "next/link"
 
 const data = {
   user: {
@@ -44,36 +44,36 @@ const data = {
   navMain: [
     {
       title: "Shop",
-      url: "/products",
+      url: "/dashboard/products",
       icon: ShoppingBag,
       isActive: true,
       items: [
         {
           title: "All Products",
-          url: "/products",
+          url: "/dashboard/products",
         },
         {
           title: "New Arrivals",
-          url: "/products?sort=newest",
+          url: "/dashboard/products?sort=new",
         },
         {
           title: "Best Sellers",
-          url: "/products?sort=popular",
+          url: "/dashboard/products?sort=best",
         },
         {
           title: "On Sale",
-          url: "/products?sale=true",
+          url: "/dashboard/products?filter=sale",
         },
       ],
     },
     {
       title: "Categories",
-      url: "/categories",
+      url: "/dashboard/categories",
       icon: Grid3X3,
       items: [
         {
           title: "Electronics",
-          url: "/products?category=electronics",
+          url: "/dashboard/categories/electronics",
         },
         {
           title: "Laptops",
@@ -189,7 +189,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/">
+              <Link href="/">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <ShoppingBag className="size-4" />
                 </div>
@@ -197,7 +197,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate font-bold">TechStore</span>
                   <span className="truncate text-xs">E-commerce Platform</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
