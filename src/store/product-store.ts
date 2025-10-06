@@ -1,3 +1,4 @@
+
 import { create } from 'zustand'
 
 export interface Product {
@@ -15,12 +16,26 @@ export interface Product {
         id: string
         name: string
         slug: string
+        description?: string
+        image?: string
+        createdAt: string
+        updatedAt: string
     }
+    categoryId: string
     createdAt: string
     updatedAt: string
+    reviews: {
+        id: string
+        rating: number
+        comment: string
+        userId: string
+        productId: string
+        createdAt: string
+        updatedAt: string
+    }[]
 }
 
-interface ProductFilters {
+export interface ProductFilters {
     category: string
     priceRange: [number, number]
     rating: number
@@ -31,7 +46,7 @@ interface ProductFilters {
     sortOrder: 'asc' | 'desc'
 }
 
-interface ProductState {
+export interface ProductState {
     products: Product[]
     filteredProducts: Product[]
     filters: ProductFilters
@@ -52,7 +67,7 @@ interface ProductState {
     getProductsByCategory: (categorySlug: string) => Product[]
 }
 
-const defaultFilters: ProductFilters = {
+export const defaultFilters: ProductFilters = {
     category: 'all',
     priceRange: [0, 2000],
     rating: 0,
@@ -63,7 +78,7 @@ const defaultFilters: ProductFilters = {
     sortOrder: 'asc'
 }
 
-const applyFilters = (products: Product[], filters: ProductFilters): Product[] => {
+export const applyFilters = (products: Product[], filters: ProductFilters): Product[] => {
     let filtered = [...products]
 
 
