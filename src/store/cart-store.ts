@@ -16,7 +16,7 @@ interface CartState {
     totalItems: number
     totalPrice: number
 
-    addItem: (product: Omit<CartItem, 'quantity'>) => void
+    addItem: (product: Omit<CartItem, 'quantity'>, quantity?: number) => void
     removeItem: (id: string) => void
     updateQuantity: (id: string, quantity: number) => void
     clearCart: () => void
@@ -32,20 +32,22 @@ export const useCartStore = create<CartState>()(
             totalItems: 0,
             totalPrice: 0,
 
-            addItem: (product) => {
+            addItem: (product, quantity = 1) => {
                 const items = get().items
                 const existingItem = items.find(item => item.id === product.id)
 
                 let newItems: CartItem[]
 
                 if (existingItem) {
+                    const newQuantity = Math.min(existingItem.quantity + quantity, product.stock)
                     newItems = items.map(item =>
                         item.id === product.id
-                            ? { ...item, quantity: item.quantity + 1 }
+                            ? { ...item, quantity: newQuantity }
                             : item
                     )
                 } else {
-                    newItems = [...items, { ...product, quantity: 1 }]
+                    const safeQuantity = Math.min(quantity, product.stock)
+                    newItems = [...items, { ...product, quantity: safeQuantity }]
                 }
 
                 const totalItems = newItems.reduce((sum, item) => sum + item.quantity, 0)

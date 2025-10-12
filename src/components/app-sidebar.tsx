@@ -6,16 +6,9 @@ import {
   Package,
   Grid3X3,
   Users,
-  BarChart3,
-  Settings2,
   ShoppingCart,
   Heart,
   Search,
-  Home,
-  Smartphone,
-  Laptop,
-  Shirt,
-  Gift,
   LifeBuoy,
 } from "lucide-react"
 
@@ -37,9 +30,9 @@ import Link from "next/link"
 
 const data = {
   user: {
-    name: "Marcos Reynoso",
-    email: "m@example.com",
-    avatar: "/avatars/user.jpg",
+    name: "Guest User",
+    email: "guest@example.com",
+    avatar: "/avatars/default.jpg",
   },
   navMain: [
     {
@@ -77,15 +70,15 @@ const data = {
         },
         {
           title: "Laptops",
-          url: "/products?category=laptops",
+          url: "/dashboard/products?category=laptops",
         },
         {
           title: "Smartphones",
-          url: "/products?category=smartphones",
+          url: "/dashboard/products?category=smartphones",
         },
         {
           title: "Clothing",
-          url: "/products?category=clothing",
+          url: "/dashboard/products?category=clothing",
         },
       ],
     },
@@ -112,29 +105,6 @@ const data = {
         },
       ],
     },
-    {
-      title: "Admin Panel",
-      url: "/admin",
-      icon: Settings2,
-      items: [
-        {
-          title: "Dashboard",
-          url: "/admin",
-        },
-        {
-          title: "Products",
-          url: "/admin/products",
-        },
-        {
-          title: "Orders",
-          url: "/admin/orders",
-        },
-        {
-          title: "Customers",
-          url: "/admin/customers",
-        },
-      ],
-    },
   ],
   navSecondary: [
     {
@@ -148,13 +118,13 @@ const data = {
       icon: Package,
     },
   ],
-  // Cambiar "projects" por "quickAccess" 
+ 
   quickAccess: [
     {
       name: "Shopping Cart",
       url: "/cart",
       icon: ShoppingCart,
-      badge: "3", // Número de items
+      badge: "3",
     },
     {
       name: "Wishlist",
@@ -162,22 +132,20 @@ const data = {
       icon: Heart,
       badge: "12",
     },
-    {
-      name: "Search",
-      url: "/search",
-      icon: Search,
-    },
+  
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const totalItems = useCartStore(state => state.totalItems)
   
-  // Actualizar badge del carrito dinámicamente
-  const quickAccessWithCartCount = data.quickAccess.map(item => 
-    item.name === "Shopping Cart" 
-      ? { ...item, badge: totalItems > 0 ? totalItems.toString() : undefined }
-      : item
+
+  const quickAccessWithCartCount = React.useMemo(() => 
+    data.quickAccess.map(item => 
+      item.name === "Shopping Cart" 
+        ? { ...item, badge: totalItems > 0 ? totalItems.toString() : undefined }
+        : item
+    ), [totalItems]
   )
 
   return (

@@ -1,4 +1,4 @@
-'use cliente'
+'use client'
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -30,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps){
           name: product.name,
           price: product.price,
           image: product.image,
-          slug: product.category.slug,
+          slug: product.slug,
           stock: product.stock
         })
         
@@ -49,7 +49,7 @@ export default function ProductCard({ product }: ProductCardProps){
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/dashboard/products/${product.slug}`}>
        
           <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
             {product.featured && (

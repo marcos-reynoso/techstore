@@ -14,7 +14,7 @@ export default function Home() {
           Go to Dashboard
         </a>
         <a 
-          href="/products" 
+          href="/dashboard/products" 
           className="px-6 py-3 border border-border rounded-lg hover:bg-accent"
         >
           View Products

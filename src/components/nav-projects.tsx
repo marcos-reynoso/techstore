@@ -1,6 +1,7 @@
 // src/components/nav-projects.tsx
 "use client"
 
+import Link from "next/link"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -29,7 +30,7 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={item.url}>
                 <div className="flex items-center gap-2 flex-1">
                   <item.icon className="size-4" />
                   <span>{item.name}</span>
@@ -39,7 +40,7 @@ export function NavProjects({
                     {item.badge}
                   </Badge>
                 )}
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
