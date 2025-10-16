@@ -5,9 +5,10 @@ import { Prisma } from '@prisma/client'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
@@ -19,7 +20,7 @@ export async function GET(
 
 
     const category = await prisma.category.findUnique({
-      where: { slug: params.slug }
+      where: { slug: resolvedParams.slug }
     })
 
     if (!category) {

@@ -37,48 +37,48 @@ const data = {
   navMain: [
     {
       title: "Shop",
-      url: "/dashboard/products",
+      url: "/products",
       icon: ShoppingBag,
       isActive: true,
       items: [
         {
           title: "All Products",
-          url: "/dashboard/products",
+          url: "/products",
         },
         {
           title: "New Arrivals",
-          url: "/dashboard/products?sort=new",
+          url: "/products?sort=new",
         },
         {
           title: "Best Sellers",
-          url: "/dashboard/products?sort=best",
+          url: "/products?sort=best",
         },
         {
           title: "On Sale",
-          url: "/dashboard/products?filter=sale",
+          url: "/products?filter=sale",
         },
       ],
     },
     {
       title: "Categories",
-      url: "/dashboard/categories",
+      url: "/categories",
       icon: Grid3X3,
       items: [
         {
-          title: "Electronics",
-          url: "/dashboard/categories/electronics",
+          title: "All Categories",
+          url: "/categories",
         },
         {
           title: "Laptops",
-          url: "/dashboard/products?category=laptops",
+          url: "/products?category=laptops",
         },
         {
           title: "Smartphones",
-          url: "/dashboard/products?category=smartphones",
+          url: "/products?category=smartphones",
         },
         {
           title: "Clothing",
-          url: "/dashboard/products?category=clothing",
+          url: "/products?category=clothing",
         },
       ],
     },
@@ -118,7 +118,7 @@ const data = {
       icon: Package,
     },
   ],
- 
+
   quickAccess: [
     {
       name: "Shopping Cart",
@@ -128,21 +128,21 @@ const data = {
     },
     {
       name: "Wishlist",
-      url: "/wishlist", 
+      url: "/wishlist",
       icon: Heart,
       badge: "12",
     },
-  
+
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const totalItems = useCartStore(state => state.totalItems)
-  
 
-  const quickAccessWithCartCount = React.useMemo(() => 
-    data.quickAccess.map(item => 
-      item.name === "Shopping Cart" 
+
+  const quickAccessWithCartCount = React.useMemo(() =>
+    data.quickAccess.map(item =>
+      item.name === "Shopping Cart"
         ? { ...item, badge: totalItems > 0 ? totalItems.toString() : undefined }
         : item
     ), [totalItems]
@@ -170,16 +170,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects 
-          projects={quickAccessWithCartCount} 
-          title="Quick Access" 
+        <NavProjects
+          projects={quickAccessWithCartCount}
+          title="Quick Access"
         />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      
+
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>

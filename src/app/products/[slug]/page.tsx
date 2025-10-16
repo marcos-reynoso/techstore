@@ -4,13 +4,13 @@ import { RelatedProducts } from '@/components/products/related-products'
 import { Breadcrumbs } from '@/components/ui/breadcrumbs'
 
 interface ProductPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 async function getProduct(slug: string) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products/${slug}`, {
-      cache: 'no-store' 
+      cache: 'no-store'
     })
 
     if (!response.ok) {
@@ -29,7 +29,8 @@ async function getProduct(slug: string) {
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const product = await getProduct(params.slug)
+  const resolvedParams = await params
+  const product = await getProduct(resolvedParams.slug)
 
   if (!product) {
     return {
@@ -50,23 +51,24 @@ export async function generateMetadata({ params }: ProductPageProps) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProduct(params.slug)
+  const resolvedParams = await params
+  const product = await getProduct(resolvedParams.slug)
 
   if (!product) {
     notFound()
   }
 
   const breadcrumbItems = [
-    { label: 'Home', href: '/dashboard' },
-    { label: 'Products', href: '/dashboard/products' },
-    { label: product.category.name, href: `/dashboard/products?category=${product.category.slug}` },
-    { label: product.name.split('->')[0], href: `/dashboard/products/${product.slug}` }
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products' },
+    { label: product.category.name, href: `/products?category=${product.category.slug}` },
+    { label: product.name, href: `/products/${product.slug}` }
   ]
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <Breadcrumbs items={breadcrumbItems} />
-      
+
       <div className="mt-8">
         <ProductDetails product={product} />
       </div>

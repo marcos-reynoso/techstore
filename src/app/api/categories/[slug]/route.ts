@@ -12,11 +12,12 @@ const CategoryUpdateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const category = await prisma.category.findUnique({
-      where: { slug: params.slug },
+      where: { slug: resolvedParams.slug },
       include: {
         _count: {
           select: { products: true }
@@ -44,15 +45,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const body = await request.json()
     const validatedData = CategoryUpdateSchema.parse(body)
 
 
     const existingCategory = await prisma.category.findUnique({
-      where: { slug: params.slug }
+      where: { slug: resolvedParams.slug }
     })
 
     if (!existingCategory) {
@@ -78,7 +80,7 @@ export async function PUT(
 
 
     const updatedCategory = await prisma.category.update({
-      where: { slug: params.slug },
+      where: { slug: resolvedParams.slug },
       data: validatedData,
       include: {
         _count: {
@@ -107,11 +109,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const resolvedParams = await params
     const category = await prisma.category.findUnique({
-      where: { slug: params.slug },
+      where: { slug: resolvedParams.slug },
       include: {
         _count: {
           select: { products: true }
@@ -138,7 +141,7 @@ export async function DELETE(
     }
 
     await prisma.category.delete({
-      where: { slug: params.slug }
+      where: { slug: resolvedParams.slug }
     })
 
     return NextResponse.json({

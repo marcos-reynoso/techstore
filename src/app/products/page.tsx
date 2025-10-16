@@ -2,14 +2,15 @@ import { ProductGrid } from '@/components/products/product-grid'
 import { prisma } from '@/lib/prisma'
 
 
-export default async function ProductsPage({ searchParams }: { searchParams: { page?: string, category?: string } }) {
-  const currentPage = parseInt(searchParams.page || '1')
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ page?: string, category?: string }> }) {
+  const params = await searchParams
+  const currentPage = parseInt(params.page || '1')
   const limit = 8
   const offset = (currentPage - 1) * limit
 
 
-  const whereClause = searchParams.category 
-    ? { category: { slug: searchParams.category } }
+  const whereClause = params.category
+    ? { category: { slug: params.category } }
     : {}
 
   const products = await prisma.product.findMany({
@@ -25,7 +26,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { p
     }
   })
 
-  
+
   const serializedProducts = products.map(product => ({
     ...product,
     price: product.price.toNumber(),

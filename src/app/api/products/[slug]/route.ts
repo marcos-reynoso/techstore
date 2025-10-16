@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
+        const resolvedParams = await params
         const product = await prisma.product.findUnique({
-            where: { slug: params.slug },
+            where: { slug: resolvedParams.slug },
             include: {
                 category: {
                     select: { id: true, name: true, slug: true, description: true, image: true, createdAt: true, updatedAt: true }
@@ -68,8 +69,8 @@ export async function GET(
                 ...product.category,
                 description: product.category.description || undefined,
                 image: product.category.image || undefined,
-                createdAt: product.createdAt.toISOString(),
-                updatedAt: product.updatedAt.toISOString()
+                createdAt: product.category.createdAt.toISOString(),
+                updatedAt: product.category.updatedAt.toISOString()
             },
             reviews: product.reviews.map(review => ({
                 ...review,
