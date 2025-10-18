@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingCart, Heart, Star } from 'lucide-react'
@@ -7,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { useCartStore } from '@/store/cart-store'
+import { toast } from 'sonner'
 import { Product } from "@/store/product-store"
 
 
@@ -14,6 +17,8 @@ interface ProductCardProps {
   product: Product
 }
 export default function ProductCard({ product }: ProductCardProps) {
+  const { data: session } = useSession()
+  const router = useRouter()
   const [isHovered, setIsHovered] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const addItem = useCartStore(state => state.addItem)
@@ -21,6 +26,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // Verificar autenticación
+    if (!session) {
+      toast.error('Please login to add items to cart')
+      router.push('/login')
+      return
+    }
 
     setIsAddingToCart(true)
 
@@ -33,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         slug: product.slug,
         stock: product.stock
       })
-
+      toast.success('Added to cart!')
 
       await new Promise(resolve => setTimeout(resolve, 500))
     } finally {
@@ -115,8 +127,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                   <Star
                     key={i}
                     className={`h-3 w-3 ${i < Math.floor(product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length || 0)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300'
                       }`}
                   />
                 ))}

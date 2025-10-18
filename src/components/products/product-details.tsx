@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,13 +19,22 @@ interface ProductDetailsProps {
 }
 
 export function ProductDetails({ product }: ProductDetailsProps) {
+  const { data: session } = useSession()
+  const router = useRouter()
   const [selectedImage, setSelectedImage] = useState(product.image)
   const [quantity, setQuantity] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
-  
+
   const addItem = useCartStore(state => state.addItem)
 
   const handleAddToCart = async () => {
+    // Verificar si el usuario está autenticado
+    if (!session) {
+      toast.error('Please login to add items to cart')
+      router.push('/login')
+      return
+    }
+
     if (product.stock < quantity) {
       toast.error('Not enough stock available')
       return
@@ -47,6 +58,36 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     }
   }
 
+  const handleAddToWishlist = () => {
+    if (!session) {
+      toast.error('Please login to add items to wishlist')
+      router.push('/login')
+      return
+    }
+
+    // Obtener wishlist actual
+    const saved = localStorage.getItem('wishlist')
+    const wishlist = saved ? JSON.parse(saved) : []
+
+    // Verificar si ya existe
+    if (wishlist.find((item: any) => item.id === product.id)) {
+      toast.info('Already in wishlist')
+      return
+    }
+
+    // Agregar a wishlist
+    wishlist.push({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      image: product.image,
+      stock: product.stock
+    })
+    localStorage.setItem('wishlist', JSON.stringify(wishlist))
+    toast.success('Added to wishlist!')
+  }
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -64,11 +105,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-4 w-4 ${
-          i < Math.floor(rating)
+        className={`h-4 w-4 ${i < Math.floor(rating)
             ? 'fill-yellow-400 text-yellow-400'
             : 'text-gray-300'
-        }`}
+          }`}
       />
     ))
   }
@@ -91,14 +131,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </Badge>
           )}
         </div>
-        
+
         {product.images.length > 0 && (
           <div className="grid grid-cols-4 gap-2">
             <button
               onClick={() => setSelectedImage(product.image)}
-              className={`aspect-square relative overflow-hidden rounded-lg border-2 ${
-                selectedImage === product.image ? 'border-primary' : 'border-gray-200'
-              }`}
+              className={`aspect-square relative overflow-hidden rounded-lg border-2 ${selectedImage === product.image ? 'border-primary' : 'border-gray-200'
+                }`}
             >
               <Image
                 src={product.image}
@@ -111,9 +150,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <button
                 key={index}
                 onClick={() => setSelectedImage(image)}
-                className={`aspect-square relative overflow-hidden rounded-lg border-2 ${
-                  selectedImage === image ? 'border-primary' : 'border-gray-200'
-                }`}
+                className={`aspect-square relative overflow-hidden rounded-lg border-2 ${selectedImage === image ? 'border-primary' : 'border-gray-200'
+                  }`}
               >
                 <Image
                   src={image}
@@ -134,7 +172,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             {product.category.name}
           </Badge>
           <h1 className="text-3xl font-bold text-white">{product.name}</h1>
-          
+
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-1">
               {renderStars(
@@ -164,13 +202,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
         {/* Stock Status */}
         <div className="flex items-center gap-2">
-          <div className={`h-3 w-3 rounded-full ${
-            product.stock > 10 ? 'bg-green-500' : 
-            product.stock > 0 ? 'bg-yellow-500' : 'bg-red-500'
-          }`} />
+          <div className={`h-3 w-3 rounded-full ${product.stock > 10 ? 'bg-green-500' :
+              product.stock > 0 ? 'bg-yellow-500' : 'bg-red-500'
+            }`} />
           <span className="text-sm">
-            {product.stock > 10 ? 'In Stock' : 
-             product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock'}
+            {product.stock > 10 ? 'In Stock' :
+              product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock'}
           </span>
         </div>
 
@@ -209,11 +246,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <ShoppingCart className="h-4 w-4 mr-2" />
               {isLoading ? 'Adding...' : 'Add to Cart'}
             </Button>
-            
-            <Button variant="outline" size="lg">
+
+            <Button variant="outline" size="lg" onClick={handleAddToWishlist}>
               <Heart className="h-4 w-4" />
             </Button>
-            
+
             <Button variant="outline" size="lg" onClick={handleShare}>
               <Share2 className="h-4 w-4" />
             </Button>
@@ -231,7 +268,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <p className="text-xs text-gray-600">On orders over $50</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4 text-center">
               <Shield className="h-6 w-6 mx-auto mb-2 text-green-600" />
@@ -239,7 +276,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <p className="text-xs text-gray-600">100% protected</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4 text-center">
               <RotateCcw className="h-6 w-6 mx-auto mb-2 text-purple-600" />

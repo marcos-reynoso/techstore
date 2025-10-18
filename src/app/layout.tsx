@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SessionProvider } from "next-auth/react";
 import '@/app/globals.css';
 
 const geistSans = Geist({
@@ -30,18 +31,20 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="[--header-height:calc(--spacing(14))]">
-          <SidebarProvider className="flex flex-col">
-            <SiteHeader />
-            <div className="flex flex-1">
-              <AppSidebar />
-              <SidebarInset>
-                {children}
-              </SidebarInset>
-            </div>
-          </SidebarProvider>
-        </div>
-        <Toaster position="top-right" />
+        <SessionProvider>
+          <div className="[--header-height:calc(--spacing(14))]">
+            <SidebarProvider className="flex flex-col">
+              <SiteHeader />
+              <div className="flex flex-1">
+                <AppSidebar />
+                <SidebarInset>
+                  {children}
+                </SidebarInset>
+              </div>
+            </SidebarProvider>
+          </div>
+          <Toaster position="top-right" />
+        </SessionProvider>
       </body>
     </html>
   );

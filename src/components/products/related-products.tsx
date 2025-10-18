@@ -16,13 +16,13 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Related Products</h2>
         <Link
-          href={`/dashboard/products?category=${products[0]?.category.slug}`}
+          href={`/products?category=${products[0]?.category.slug}`}
           className="text-primary hover:underline"
         >
           View all in {products[0]?.category.name}
         </Link>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <ProductCard

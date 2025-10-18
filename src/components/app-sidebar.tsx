@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSession } from "next-auth/react"
 import {
   ShoppingBag,
   Package,
@@ -46,16 +47,8 @@ const data = {
           url: "/products",
         },
         {
-          title: "New Arrivals",
-          url: "/products?sort=new",
-        },
-        {
-          title: "Best Sellers",
-          url: "/products?sort=best",
-        },
-        {
-          title: "On Sale",
-          url: "/products?filter=sale",
+          title: "Featured",
+          url: "/products?featured=true",
         },
       ],
     },
@@ -96,10 +89,6 @@ const data = {
           url: "/profile/orders",
         },
         {
-          title: "Wishlist",
-          url: "/profile/wishlist",
-        },
-        {
           title: "Settings",
           url: "/profile/settings",
         },
@@ -137,7 +126,15 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession()
   const totalItems = useCartStore(state => state.totalItems)
+
+
+  const userData = React.useMemo(() => ({
+    name: session?.user?.name || "Guest User",
+    email: session?.user?.email || "guest@example.com",
+    avatar: session?.user?.avatar || "/avatars/default.jpg",
+  }), [session])
 
 
   const quickAccessWithCartCount = React.useMemo(() =>
@@ -181,7 +178,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )
