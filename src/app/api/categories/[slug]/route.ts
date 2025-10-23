@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const CategoryUpdateSchema = z.object({
   name: z.string().min(1).optional(),
@@ -34,7 +35,7 @@ export async function GET(
 
     return NextResponse.json(category)
   } catch (error) {
-    console.error('Error fetching category:', error)
+    logger.error('Error fetching category:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -98,7 +99,7 @@ export async function PUT(
       )
     }
 
-    console.error('Error updating category:', error)
+    logger.error('Error updating category:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -148,7 +149,7 @@ export async function DELETE(
       message: `Category '${category.name}' deleted successfully`
     })
   } catch (error) {
-    console.error('Error deleting category:', error)
+    logger.error('Error deleting category:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -3,6 +3,8 @@ import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { registerSchema } from '@/lib/validations/auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
+import { auth } from '@/lib/auth'
 
 
 export async function POST(request: NextRequest) {
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
                 name: validatedData.name,
                 email: validatedData.email,
                 password: hashedPassword,
-                avatar: validatedData.avatar || '/avatars/default.jpg',
+                avatar: validatedData.avatar || '/images/avatars/default.jpg',
             },
             select: {
                 id: true,
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        console.error('Error creating user:', error)
+        logger.error('Error creating user:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -69,6 +71,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     try {
+        const session = await auth()
+        
+        if (!session || session.user.role !== 'ADMIN') {
+            return NextResponse.json(
+                { error: 'Forbidden - Admin access required' },
+                { status: 403 }
+            )
+        }
+
         const users = await prisma.user.findMany({
             select: {
                 id: true,
@@ -85,7 +96,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(users)
     } catch (error) {
-        console.error('Error fetching users:', error)
+        logger.error('Error fetching users:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

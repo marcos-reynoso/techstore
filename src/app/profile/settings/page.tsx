@@ -12,13 +12,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { updateProfileSchema } from "@/lib/validations/auth"
 import { z } from "zod"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Upload, Loader2 } from "lucide-react"
 import Link from "next/link"
+import type { ProfileUpdateData } from "@/types"
 
 export default function SettingsPage() {
     const { data: session, status, update } = useSession()
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -56,7 +58,7 @@ export default function SettingsPage() {
         setIsLoading(true)
 
         try {
-            const dataToUpdate: any = {}
+            const dataToUpdate: ProfileUpdateData = {}
             if (formData.name !== session.user.name) dataToUpdate.name = formData.name
             if (formData.email !== session.user.email) dataToUpdate.email = formData.email
             if (formData.avatar !== session.user.avatar) dataToUpdate.avatar = formData.avatar
@@ -112,6 +114,50 @@ export default function SettingsPage() {
         }
     }
 
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Only images are allowed (JPEG, PNG, GIF, WebP)')
+            return
+        }
+
+
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be less than 2MB')
+            return
+        }
+
+        setIsUploadingAvatar(true)
+
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const response = await fetch('/api/upload/avatar', {
+                method: 'POST',
+                body: formData
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                toast.error(data.error || 'Failed to upload image')
+                return
+            }
+
+            setFormData(prev => ({ ...prev, avatar: data.url }))
+            toast.success('Image uploaded successfully!')
+        } catch (error) {
+            toast.error('Failed to upload image')
+        } finally {
+            setIsUploadingAvatar(false)
+        }
+    }
+
     const getInitials = (name?: string) => {
         if (!name) return "U"
         return name
@@ -145,23 +191,30 @@ export default function SettingsPage() {
                     <CardContent className="space-y-6">
 
                         <div className="flex flex-col items-center gap-4">
-                            <Avatar className="h-32 w-32">
-                                <AvatarImage src={formData.avatar || undefined} />
-                                <AvatarFallback className="text-2xl">
-                                    {getInitials(formData.name)}
-                                </AvatarFallback>
-                            </Avatar>
+                            <div className="relative">
+                                <Avatar className="h-32 w-32">
+                                    <AvatarImage src={formData.avatar || undefined} />
+                                    <AvatarFallback className="text-2xl">
+                                        {getInitials(formData.name)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                {isUploadingAvatar && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                                    </div>
+                                )}
+                            </div>
                             <div className="w-full max-w-md space-y-2">
-                                <Label htmlFor="avatar">Avatar URL (Optional)</Label>
+                                <Label htmlFor="avatar">Profile Photo (Optional)</Label>
                                 <Input
                                     id="avatar"
-                                    type="url"
-                                    placeholder="https://example.com/avatar.jpg"
-                                    value={formData.avatar}
-                                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleFileChange}
+                                    disabled={isUploadingAvatar}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Enter a URL to your profile picture or leave empty for default
+                                    Max 2MB. Formats: JPEG, PNG, GIF, WebP
                                 </p>
                             </div>
                         </div>
@@ -214,7 +267,7 @@ export default function SettingsPage() {
                                 <Input
                                     id="newPassword"
                                     type="password"
-                                    placeholder="At least 6 characters"
+                                    placeholder="At least 8 characters (uppercase, lowercase, number)"
                                     value={formData.newPassword}
                                     onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
                                 />

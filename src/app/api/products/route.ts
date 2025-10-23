@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching products:', error)
+    logger.error('Error fetching products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Error creating product:', error)
+    logger.error('Error creating product:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 import { Prisma } from '@prisma/client'
 
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
       total: products.length
     })
   } catch (error) {
-    console.error('Error searching products:', error)
+    logger.error('Error searching products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

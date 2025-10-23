@@ -10,12 +10,14 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { registerSchema } from "@/lib/validations/auth"
 import { z } from "zod"
+import { signIn } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Upload } from "lucide-react"
+import { Upload, Loader2 } from "lucide-react"
 
 export default function RegisterPage() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -49,7 +51,21 @@ export default function RegisterPage() {
             }
 
             toast.success("Account created successfully!")
-            router.push("/login")
+
+
+            const signInResult = await signIn("credentials", {
+                email: validatedData.email,
+                password: validatedData.password,
+                redirect: false,
+            })
+
+            if (signInResult?.error) {
+                toast.error("Account created but login failed. Please login manually.")
+                router.push("/login")
+            } else {
+                toast.success("Welcome! You're now logged in.")
+                router.push("/")
+            }
         } catch (error) {
             if (error instanceof z.ZodError) {
                 toast.error(error.message)
@@ -58,6 +74,50 @@ export default function RegisterPage() {
             }
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Only images are allowed (JPEG, PNG, GIF, WebP)')
+            return
+        }
+
+
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be less than 2MB')
+            return
+        }
+
+        setIsUploadingAvatar(true)
+
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const response = await fetch('/api/upload/avatar', {
+                method: 'POST',
+                body: formData
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                toast.error(data.error || 'Failed to upload image')
+                return
+            }
+
+            setFormData(prev => ({ ...prev, avatar: data.url }))
+            toast.success('Image uploaded successfully!')
+        } catch (error) {
+            toast.error('Failed to upload image')
+        } finally {
+            setIsUploadingAvatar(false)
         }
     }
 
@@ -82,23 +142,30 @@ export default function RegisterPage() {
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
                         <div className="flex flex-col items-center gap-4">
-                            <Avatar className="h-24 w-24">
-                                <AvatarImage src={formData.avatar || undefined} />
-                                <AvatarFallback>
-                                    {formData.name ? getInitials(formData.name) : <Upload className="h-8 w-8" />}
-                                </AvatarFallback>
-                            </Avatar>
+                            <div className="relative">
+                                <Avatar className="h-24 w-24">
+                                    <AvatarImage src={formData.avatar || undefined} />
+                                    <AvatarFallback>
+                                        {formData.name ? getInitials(formData.name) : <Upload className="h-8 w-8" />}
+                                    </AvatarFallback>
+                                </Avatar>
+                                {isUploadingAvatar && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                                        <Loader2 className="h-6 w-6 animate-spin text-white" />
+                                    </div>
+                                )}
+                            </div>
                             <div className="w-full space-y-2">
-                                <Label htmlFor="avatar">Avatar URL (Optional)</Label>
+                                <Label htmlFor="avatar">Profile Photo (Optional)</Label>
                                 <Input
                                     id="avatar"
-                                    type="url"
-                                    placeholder="https://example.com/avatar.jpg"
-                                    value={formData.avatar}
-                                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleFileChange}
+                                    disabled={isUploadingAvatar}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Leave empty to use default avatar
+                                    Max 2MB. Formats: JPEG, PNG, GIF, WebP
                                 </p>
                             </div>
                         </div>
@@ -132,14 +199,14 @@ export default function RegisterPage() {
                             <Input
                                 id="password"
                                 type="password"
-                                placeholder="At least 6 characters"
+                                placeholder="At least 8 characters (uppercase, lowercase, number)"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 required
                             />
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col gap-4">
+                    <CardFooter className="flex flex-col gap-4 space-y-4">
                         <Button type="submit" className="w-full" disabled={isLoading}>
                             {isLoading ? "Creating account..." : "Sign Up"}
                         </Button>

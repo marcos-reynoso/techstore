@@ -9,7 +9,6 @@ import {
   Users,
   ShoppingCart,
   Heart,
-  Search,
   LifeBuoy,
 } from "lucide-react"
 
@@ -30,11 +29,7 @@ import { useCartStore } from "@/store/cart-store"
 import Link from "next/link"
 
 const data = {
-  user: {
-    name: "Guest User",
-    email: "guest@example.com",
-    avatar: "/avatars/default.jpg",
-  },
+
   navMain: [
     {
       title: "Shop",
@@ -113,13 +108,11 @@ const data = {
       name: "Shopping Cart",
       url: "/cart",
       icon: ShoppingCart,
-      badge: "3",
     },
     {
       name: "Wishlist",
       url: "/wishlist",
       icon: Heart,
-      badge: "12",
     },
 
   ],
@@ -130,11 +123,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const totalItems = useCartStore(state => state.totalItems)
 
 
-  const userData = React.useMemo(() => ({
-    name: session?.user?.name || "Guest User",
-    email: session?.user?.email || "guest@example.com",
-    avatar: session?.user?.avatar || "/avatars/default.jpg",
-  }), [session])
+  const userData = React.useMemo(() => {
+    if (!session?.user) {
+      return null
+    }
+    return {
+      name: session.user.name ?? null,
+      email: session.user.email ?? null,
+      avatar: session.user.avatar ?? null,
+    }
+  }, [session])
 
 
   const quickAccessWithCartCount = React.useMemo(() =>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
+import { logger } from '@/lib/logger'
 
 
 export async function GET(
@@ -99,7 +100,7 @@ export async function GET(
       }
     })
   } catch (error) {
-    console.error('Error fetching category products:', error)
+    logger.error('Error fetching category products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

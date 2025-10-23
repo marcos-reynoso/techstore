@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export async function GET(
     request: NextRequest,
@@ -95,7 +96,7 @@ export async function GET(
 
         return NextResponse.json(serializedProduct)
     } catch (error) {
-        console.error('Error fetching product by slug:', error)
+        logger.error('Error fetching product by slug:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

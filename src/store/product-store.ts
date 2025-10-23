@@ -116,7 +116,8 @@ export const applyFilters = (products: Product[], filters: ProductFilters): Prod
 
 
     filtered.sort((a, b) => {
-        let aValue: any, bValue: any
+        let aValue: string | number | Date
+        let bValue: string | number | Date
 
         switch (filters.sortBy) {
             case 'price':

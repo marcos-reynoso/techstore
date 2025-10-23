@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { Prisma, OrderStatus } from '@prisma/client'
+import { logger } from '@/lib/logger'
 
 const OrderItemSchema = z.object({
   productId: z.string(),
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching orders:', error)
+    logger.error('Error fetching orders:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Error creating order:', error)
+    logger.error('Error creating order:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

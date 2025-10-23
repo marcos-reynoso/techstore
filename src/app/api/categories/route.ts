@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const CategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -23,7 +24,7 @@ export async function GET() {
 
     return NextResponse.json({ categories })
   } catch (error) {
-    console.error('Error fetching categories:', error)
+    logger.error('Error fetching categories:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Error creating category:', error)
+    logger.error('Error creating category:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

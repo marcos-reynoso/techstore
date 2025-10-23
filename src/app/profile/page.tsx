@@ -98,7 +98,7 @@ export default function ProfilePage() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <Button asChild variant="outline" className="w-full justify-start">
-                            <Link href="/profile/orders">
+                            <Link href="/profile/orders/page">
                                 <ShoppingBag className="h-4 w-4 mr-2" />
                                 My Orders
                             </Link>

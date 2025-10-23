@@ -90,7 +90,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             e.preventDefault()
             e.stopPropagation()
 
-            console.log('Add to wishlist:', product.id)
           }}
         >
           <Heart className="h-4 w-4 text-gray-700 hover:text-red-500 transition-colors" />
@@ -120,24 +119,27 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
 
 
-          {product.reviews && product.reviews.reduce((sum, review) => sum + review.rating, 0) > 0 && (
-            <div className="flex items-center gap-1 mb-2">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-3 w-3 ${i < Math.floor(product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length || 0)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
-                      }`}
-                  />
-                ))}
+          {product.reviews && product.reviews.length > 0 && (() => {
+            const avgRating = product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
+            return (
+              <div className="flex items-center gap-1 mb-2">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-3 w-3 ${i < Math.floor(avgRating)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {avgRating.toFixed(1)} ({product.reviews.length})
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground">
-                ({product.reviews.reduce((sum, review) => sum + review.rating, 0)})
-              </span>
-            </div>
-          )}
+            )
+          })()}
 
 
           <div className="flex items-baseline gap-2">

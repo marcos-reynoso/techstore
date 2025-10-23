@@ -70,9 +70,13 @@ export const useCartStore = create<CartState>()(
                     return
                 }
 
-                const newItems = get().items.map(item =>
-                    item.id === id ? { ...item, quantity } : item
-                )
+                const newItems = get().items.map(item => {
+                    if (item.id === id) {
+                        const safeQuantity = Math.min(quantity, item.stock)
+                        return { ...item, quantity: safeQuantity }
+                    }
+                    return item
+                })
 
                 const totalItems = newItems.reduce((sum, item) => sum + item.quantity, 0)
                 const totalPrice = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)

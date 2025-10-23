@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 
 const OrderUpdateSchema = z.object({
@@ -45,7 +46,7 @@ export async function GET(
 
     return NextResponse.json(order)
   } catch (error) {
-    console.error('Error fetching order:', error)
+    logger.error('Error fetching order:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -96,7 +97,7 @@ export async function PUT(
       )
     }
 
-    console.error('Error updating order:', error)
+    logger.error('Error updating order:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -156,7 +157,7 @@ export async function DELETE(
       orderNumber: order.orderNumber
     })
   } catch (error) {
-    console.error('Error deleting order:', error)
+    logger.error('Error deleting order:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

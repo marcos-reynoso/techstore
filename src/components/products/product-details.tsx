@@ -13,6 +13,7 @@ import { useCartStore } from '@/store/cart-store'
 import { toast } from 'sonner'
 
 import { Product } from '@/store/product-store'
+import type { WishlistItem } from '@/types'
 
 interface ProductDetailsProps {
   product: Product
@@ -28,7 +29,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const addItem = useCartStore(state => state.addItem)
 
   const handleAddToCart = async () => {
-    // Verificar si el usuario está autenticado
+
     if (!session) {
       toast.error('Please login to add items to cart')
       router.push('/login')
@@ -65,17 +66,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       return
     }
 
-    // Obtener wishlist actual
     const saved = localStorage.getItem('wishlist')
-    const wishlist = saved ? JSON.parse(saved) : []
+    const wishlist: WishlistItem[] = saved ? JSON.parse(saved) : []
 
-    // Verificar si ya existe
-    if (wishlist.find((item: any) => item.id === product.id)) {
+    if (wishlist.find((item) => item.id === product.id)) {
       toast.info('Already in wishlist')
       return
     }
 
-    // Agregar a wishlist
     wishlist.push({
       id: product.id,
       name: product.name,
@@ -106,8 +104,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       <Star
         key={i}
         className={`h-4 w-4 ${i < Math.floor(rating)
-            ? 'fill-yellow-400 text-yellow-400'
-            : 'text-gray-300'
+          ? 'fill-yellow-400 text-yellow-400'
+          : 'text-gray-300'
           }`}
       />
     ))
@@ -203,7 +201,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {/* Stock Status */}
         <div className="flex items-center gap-2">
           <div className={`h-3 w-3 rounded-full ${product.stock > 10 ? 'bg-green-500' :
-              product.stock > 0 ? 'bg-yellow-500' : 'bg-red-500'
+            product.stock > 0 ? 'bg-yellow-500' : 'bg-red-500'
             }`} />
           <span className="text-sm">
             {product.stock > 10 ? 'In Stock' :

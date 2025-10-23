@@ -4,6 +4,8 @@ import { hash, compare } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { updateProfileSchema } from '@/lib/validations/auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
+import type { UserUpdateData } from '@/types'
 
 
 export async function GET(request: NextRequest) {
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(user)
     } catch (error) {
-        console.error('Error fetching profile:', error)
+        logger.error('Error fetching profile:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -92,12 +94,14 @@ export async function PATCH(request: NextRequest) {
             }
         }
 
-        const updateData: any = {}
-
+        const updateData: UserUpdateData = {}
         if (validatedData.name) updateData.name = validatedData.name
         if (validatedData.email) updateData.email = validatedData.email
-        if (validatedData.avatar !== undefined) updateData.avatar = validatedData.avatar || '/avatars/default.jpg'
+        if (validatedData.avatar !== undefined) updateData.avatar = validatedData.avatar
 
+        if (validatedData.newPassword && validatedData.currentPassword) {
+            updateData.password = await hash(validatedData.newPassword, 12)
+        }
         if (validatedData.newPassword && validatedData.currentPassword) {
             if (!currentUser.password) {
                 return NextResponse.json(
@@ -149,7 +153,7 @@ export async function PATCH(request: NextRequest) {
             )
         }
 
-        console.error('Error updating profile:', error)
+        logger.error('Error updating profile:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
