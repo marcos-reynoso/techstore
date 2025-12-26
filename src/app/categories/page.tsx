@@ -3,12 +3,16 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Product } from '@/types'
 
 export default async function CategoriesPage() {
     const categories = await prisma.category.findMany({
         include: {
             _count: {
                 select: { products: true }
+            },
+            products: {
+                select: { stock: true }
             }
         },
         orderBy: {

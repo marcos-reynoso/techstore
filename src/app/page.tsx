@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, ShoppingBag, Truck, Shield, RotateCcw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import ProductCard from '@/components/products/product-card'
+import { Product } from '@/store/product-store'
 
 export default async function Home() {
 
@@ -23,22 +24,22 @@ export default async function Home() {
     }
   })
 
-  const serializedProducts = featuredProducts.map(product => ({
+  const serializedProducts = featuredProducts.map((product) => ({
     ...product,
-    price: product.price.toNumber(),
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
+    price: Number(product.price),
+    createdAt: new Date(product.createdAt).toISOString(),
+    updatedAt: new Date(product.updatedAt).toISOString(),
     category: {
       ...product.category,
       description: product.category.description || undefined,
       image: product.category.image || undefined,
-      createdAt: product.category.createdAt.toISOString(),
-      updatedAt: product.category.updatedAt.toISOString()
+      createdAt: new Date(product.category.createdAt).toISOString(),
+      updatedAt: new Date(product.category.updatedAt).toISOString()
     },
-    reviews: product.reviews.map(review => ({
+    reviews: product.reviews.map((review) => ({
       ...review,
-      createdAt: review.createdAt.toISOString(),
-      updatedAt: review.updatedAt.toISOString()
+      createdAt: new Date(review.createdAt).toISOString(),
+      updatedAt: new Date(review.updatedAt).toISOString()
     }))
   }))
 
@@ -54,7 +55,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-20 px-4">
+      <section className="bg-gradient-to-y from-primary/10 to-primary/5 py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <Badge className="mb-4" variant="secondary">
             <ShoppingBag className="h-3 w-3 mr-1" />
@@ -135,7 +136,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {serializedProducts.map((product) => (
+            {serializedProducts.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -172,7 +173,7 @@ export default async function Home() {
                       {category.name}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {category._count.products} items
+                      {category._count.products} products
                     </p>
                   </CardContent>
                 </Card>

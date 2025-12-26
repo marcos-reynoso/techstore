@@ -66,9 +66,9 @@ export default function RegisterPage() {
                 toast.success("Welcome! You're now logged in.")
                 router.push("/")
             }
-        } catch (error) {
+        } catch (error: unknown) {
             if (error instanceof z.ZodError) {
-                toast.error(error.message)
+                toast.error("Validation failed")
             } else {
                 toast.error("Something went wrong")
             }
