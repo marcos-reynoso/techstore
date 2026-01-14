@@ -58,7 +58,7 @@ export default function CartPage() {
                                             {item.name}
                                         </Link>
                                         <p className="text-sm text-muted-foreground mt-1">
-                                            ${item.price.toFixed(2)} each
+                                            ${item.price.toFixed(2)} USD
                                         </p>
 
                                         <div className="flex items-center gap-4 mt-3">

@@ -11,6 +11,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { useCartStore } from '@/store/cart-store'
 import { toast } from 'sonner'
 import { Product } from "@/store/product-store"
+import type { WishlistItem } from '@/types'
 
 
 interface ProductCardProps {
@@ -27,7 +28,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
-    // Verificar autenticación
+
     if (!session) {
       toast.error('Please login to add items to cart')
       router.push('/login')
@@ -54,7 +55,32 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   const isOutOfStock = product.stock === 0
+  const handleAddToWishlist = () => {
+    if (!session) {
+      toast.error('Please login to add items to wishlist')
+      router.push('/login')
+      return
+    }
 
+    const saved = localStorage.getItem('wishlist')
+    const wishlist: WishlistItem[] = saved ? JSON.parse(saved) : []
+
+    if (wishlist.find((item) => item.id === product.id)) {
+      toast.info('Already in wishlist')
+      return
+    }
+
+    wishlist.push({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      image: product.image,
+      stock: product.stock
+    })
+    localStorage.setItem('wishlist', JSON.stringify(wishlist))
+    toast.success('Added to wishlist!')
+  }
   return (
     <Card
       className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg"
@@ -82,18 +108,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
 
-        <button
-          className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm 
-                       opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                       hover:bg-white hover:scale-110"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
 
-          }}
-        >
-          <Heart className="h-4 w-4 text-gray-700 hover:text-red-500 transition-colors" />
-        </button>
 
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-gray-100">
@@ -119,7 +134,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
 
 
-          {product.reviews && product.reviews.length > 0 && (() => {
+          {product.reviews && product.reviews.length > 0 ? (() => {
             const avgRating = product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
             return (
               <div className="flex items-center gap-1 mb-2">
@@ -139,7 +154,24 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               </div>
             )
-          })()}
+          })() : (
+            <div className="flex items-center gap-1 mb-2">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-3 w-3 ${i < 0
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300'
+                      }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-muted-foreground">
+                0 (0)
+              </span>
+            </div>
+          )}
 
 
           <div className="flex items-baseline gap-2">
@@ -151,9 +183,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className=" flex gap-1 p-4 pt-0 ">
         <Button
-          className="w-full"
+          className="w-40 cursor-pointer "
           onClick={handleAddToCart}
           disabled={isOutOfStock || isAddingToCart}
         >
@@ -164,6 +196,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               ? 'Out of Stock'
               : 'Add to Cart'
           }
+        </Button>
+        <Button className=' cursor-pointer' variant="outline" size="lg" onClick={handleAddToWishlist}>
+          <Heart className="h-4 w-4  " />
         </Button>
       </CardFooter>
     </Card>

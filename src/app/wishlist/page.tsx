@@ -26,7 +26,7 @@ export default function WishlistPage() {
     const addItem = useCartStore(state => state.addItem)
 
     useEffect(() => {
-        // Cargar wishlist desde localStorage
+
         const saved = localStorage.getItem('wishlist')
         if (saved) {
             setWishlist(JSON.parse(saved))

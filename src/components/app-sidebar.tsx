@@ -70,25 +70,7 @@ const data = {
         },
       ],
     },
-    {
-      title: "Account",
-      url: "/profile",
-      icon: Users,
-      items: [
-        {
-          title: "My Profile",
-          url: "/profile",
-        },
-        {
-          title: "My Orders",
-          url: "/profile/orders",
-        },
-        {
-          title: "Settings",
-          url: "/profile/settings",
-        },
-      ],
-    },
+
   ],
   navSecondary: [
     {

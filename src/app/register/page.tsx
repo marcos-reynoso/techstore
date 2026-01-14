@@ -160,6 +160,7 @@ export default function RegisterPage() {
                                 <Input
                                     id="avatar"
                                     type="file"
+                                    className="cursor-pointer"
                                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                                     onChange={handleFileChange}
                                     disabled={isUploadingAvatar}
@@ -205,18 +206,19 @@ export default function RegisterPage() {
                                 required
                             />
                         </div>
+
+                        <CardFooter className="flex flex-col gap-4 space-y-2">
+                            <Button type="submit" className="w-full " disabled={isLoading}>
+                                {isLoading ? "Creating account..." : "Sign Up"}
+                            </Button>
+                            <p className="text-sm text-center text-muted-foreground">
+                                Already have an account?{" "}
+                                <Link href="/login" className="text-primary hover:underline">
+                                    Sign in
+                                </Link>
+                            </p>
+                        </CardFooter>
                     </CardContent>
-                    <CardFooter className="flex flex-col gap-4 space-y-4">
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Creating account..." : "Sign Up"}
-                        </Button>
-                        <p className="text-sm text-center text-muted-foreground">
-                            Already have an account?{" "}
-                            <Link href="/login" className="text-primary hover:underline">
-                                Sign in
-                            </Link>
-                        </p>
-                    </CardFooter>
                 </form>
             </Card>
         </div>
