@@ -84,18 +84,18 @@ export default function LoginPage() {
                                 required
                             />
                         </div>
+                        <CardFooter className="flex flex-col gap-4">
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? "Loading..." : "Sign In"}
+                            </Button>
+                            <p className="text-sm text-center text-muted-foreground">
+                                Don't have an account?{" "}
+                                <Link href="/register" className="text-primary hover:underline">
+                                    Sign up
+                                </Link>
+                            </p>
+                        </CardFooter>
                     </CardContent>
-                    <CardFooter className="flex flex-col gap-4">
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Loading..." : "Sign In"}
-                        </Button>
-                        <p className="text-sm text-center text-muted-foreground">
-                            Don't have an account?{" "}
-                            <Link href="/register" className="text-primary hover:underline">
-                                Sign up
-                            </Link>
-                        </p>
-                    </CardFooter>
                 </form>
             </Card>
         </div>
