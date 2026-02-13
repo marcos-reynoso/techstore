@@ -1,6 +1,15 @@
+
 import { create } from 'zustand'
 
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+export enum OrderStatus {
+    PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING',
+    SHIPPED = 'SHIPPED',
+    DELIVERED = 'DELIVERED',
+    CANCELLED = 'CANCELLED',
+    UNDEFINED = 'UNDEFINED',
+    ALL = 'ALL'
+}
 
 export interface OrderItemProduct {
     id: string
@@ -23,7 +32,7 @@ export interface OrderSummary {
     orderNumber: string
     userId: string
     total: number
-    status: OrderStatus
+    status: OrderStatus | null
     shippingName: string
     shippingEmail: string
     shippingAddress: string
@@ -34,13 +43,13 @@ export interface OrderSummary {
     orderItems: OrderItemDetail[]
     user?: {
         id: string
-        name: string | null
-        email: string | null
+        name: string
+        email: string
     }
 }
 
 export interface OrdersFilters {
-    status?: OrderStatus | 'all'
+    status?: OrderStatus | null
 }
 
 export interface OrdersPagination {
@@ -89,7 +98,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     selectedOrder: null,
     isLoading: false,
     error: null,
-    filters: { status: 'all' },
+    filters: { status: OrderStatus.PENDING },
     pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
 
     setFilters: (partial) => set({ filters: { ...get().filters, ...partial } }),
@@ -100,7 +109,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
             const current = get()
             const q = buildQuery({
                 userId,
-                status: (status ?? current.filters.status) && (status ?? current.filters.status) !== 'all' ? (status ?? current.filters.status) : undefined,
+                status: (status ?? current.filters.status) && (status ?? current.filters.status) !== 'all' ? (status ?? current.filters.status)! : undefined,
                 page: page ?? current.pagination.page,
                 limit: limit ?? current.pagination.limit,
             })
@@ -228,7 +237,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
         selectedOrder: null,
         isLoading: false,
         error: null,
-        filters: { status: 'all' },
+        filters: { status: OrderStatus.PENDING },
         pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
     }),
 }))

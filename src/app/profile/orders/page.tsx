@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Image from "next/image"
 import { toast } from "sonner"
 import { useOrdersStore } from "@/store/orders-store"
+import { OrderStatus } from "@/store/orders-store"
 
 export default function OrdersPage() {
     const { data: session, status } = useSession()
-    const userId = useMemo(() => (session?.user as any)?.id as string | undefined, [session])
+    const userId = useMemo(() => (session?.user as { id: string })?.id as string | undefined, [session])
 
     const {
         orders,
@@ -45,12 +46,12 @@ export default function OrdersPage() {
 
     const onChangePage = (nextPage: number) => {
         if (!userId) return
-        loadOrders({ userId, page: nextPage, limit: pagination.limit, status: filters.status })
+        loadOrders({ userId, page: nextPage, limit: pagination.limit, status: filters.status as OrderStatus })
     }
 
     const onChangeStatus = (value: string) => {
         if (!userId) return
-        const next = value as any
+        const next = value as OrderStatus
         setFilters({ status: next })
         loadOrders({ userId, page: 1, limit: pagination.limit, status: next })
     }
@@ -61,7 +62,7 @@ export default function OrdersPage() {
         const success = await cancelOrder(orderId)
         if (success) {
             toast.success("Order cancelled")
-            if (userId) loadOrders({ userId, page: pagination.page, limit: pagination.limit, status: filters.status })
+            if (userId) loadOrders({ userId, page: pagination.page, limit: pagination.limit, status: filters.status as OrderStatus })
         } else if (error) {
             toast.error(error)
         } else {
@@ -118,11 +119,11 @@ export default function OrdersPage() {
                                 <div className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Badge variant={order.status === 'PENDING' ? 'secondary' : order.status === 'CANCELLED' ? 'destructive' : 'default'}>
+                                <Badge variant={order.status === OrderStatus.PENDING ? 'secondary' : order.status === OrderStatus.CANCELLED ? 'destructive' : 'default'}>
                                     {order.status}
                                 </Badge>
                                 <div className="font-medium">{formatMoney(order.total)}</div>
-                                {order.status === 'PENDING' && (
+                                {order.status === OrderStatus.PENDING && (
                                     <Button variant="outline" size="sm" onClick={() => handleCancel(order.id)}>
                                         Cancel
                                     </Button>
