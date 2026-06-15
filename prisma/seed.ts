@@ -1,7 +1,11 @@
-import { Product } from '@/types';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+})
+
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
 
@@ -62,7 +66,7 @@ async function main() {
             images: ['/images/products/iphone15-pro-1.jpg', '/images/products/iphone15-pro-2.jpg'],
             stock: 50,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'smartphones')!.id
+            categoryId: categories.find(c => c.slug === 'smartphones')!.id
         },
         {
             name: 'MacBook Air M3',
@@ -73,7 +77,7 @@ async function main() {
             images: ['/images/products/macbook-air-1.jpg', '/images/products/macbook-air-2.jpg'],
             stock: 25,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'laptops')!.id
+            categoryId: categories.find(c => c.slug === 'laptops')!.id
         },
         {
             name: 'Samsung Galaxy S24',
@@ -84,7 +88,7 @@ async function main() {
             images: ['/images/products/galaxy-s24-1.jpg', '/images/products/galaxy-s24-2.jpg'],
             stock: 75,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'smartphones')!.id
+            categoryId: categories.find(c => c.slug === 'smartphones')!.id
         },
         {
             name: 'Dell XPS 13',
@@ -95,7 +99,7 @@ async function main() {
             images: ['/images/products/dell-xps-1.jpg', '/images/products/dell-xps-2.jpg'],
             stock: 30,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'laptops')!.id
+            categoryId: categories.find(c => c.slug === 'laptops')!.id
         },
         {
             name: 'Apple Watch Series 9',
@@ -106,7 +110,7 @@ async function main() {
             images: ['/images/products/apple-watch-1.jpg', '/images/products/apple-watch-2.jpg'],
             stock: 60,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'electronics')!.id
+            categoryId: categories.find(c => c.slug === 'electronics')!.id
         },
         {
             name: 'Nike Air Force 1',
@@ -117,7 +121,7 @@ async function main() {
             images: ['/images/products/nike-af1-1.jpg', '/images/products/nike-af1-2.jpg'],
             stock: 100,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'clothing')!.id
+            categoryId: categories.find(c => c.slug === 'clothing')!.id
         }
         ,
         {
@@ -129,7 +133,7 @@ async function main() {
             images: ['/images/products/sony-wh-1000xm5-1.jpg', '/images/products/sony-wh-1000xm5-2.jpg'],
             stock: 40,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'electronics')!.id
+            categoryId: categories.find(c => c.slug === 'electronics')!.id
         },
         {
             name: 'Google Pixel 8',
@@ -140,7 +144,7 @@ async function main() {
             images: ['/images/products/pixel-8-1.jpg', '/images/products/pixel-8-2.jpg'],
             stock: 50,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'smartphones')!.id
+            categoryId: categories.find(c => c.slug === 'smartphones')!.id
         },
         {
             name: 'Adidas Ultraboost 22',
@@ -151,7 +155,7 @@ async function main() {
             images: ['/images/products/adidas-ultraboost-22-1.jpg', '/images/products/adidas-ultraboost-22-2.jpg'],
             stock: 80,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'clothing')!.id
+            categoryId: categories.find(c => c.slug === 'clothing')!.id
         },
         {
             name: 'HP Spectre x360',
@@ -162,7 +166,7 @@ async function main() {
             images: ['/images/products/hp-spectre-x360-1.jpg', '/images/products/hp-spectre-x360-2.jpg'],
             stock: 20,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'laptops')!.id
+            categoryId: categories.find(c => c.slug === 'laptops')!.id
         },
         {
             name: 'Samsung Galaxy Watch 6',
@@ -173,7 +177,7 @@ async function main() {
             images: ['/images/products/galaxy-watch-6-1.jpg', '/images/products/galaxy-watch-6-2.jpg'],
             stock: 45,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'electronics')!.id
+            categoryId: categories.find(c => c.slug === 'electronics')!.id
         },
         {
             name: 'Levi\'s 501 Original Jeans',
@@ -184,7 +188,7 @@ async function main() {
             images: ['/images/products/levis-501-1.jpg', '/images/products/levis-501-2.jpg'],
             stock: 120,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'clothing')!.id
+            categoryId: categories.find(c => c.slug === 'clothing')!.id
         },
         {
             name: 'Microsoft Surface Laptop 5',
@@ -195,7 +199,7 @@ async function main() {
             images: ['/images/products/surface-laptop-5-1.jpg', '/images/products/surface-laptop-5-2.jpg'],
             stock: 25,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'laptops')!.id
+            categoryId: categories.find(c => c.slug === 'laptops')!.id
         },
         {
             name: 'Bose QuietComfort Earbuds II',
@@ -206,7 +210,7 @@ async function main() {
             images: ['/images/products/bose-qc-earbuds-ii-1.jpg', '/images/products/bose-qc-earbuds-ii-2.jpg'],
             stock: 35,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'electronics')!.id
+            categoryId: categories.find(c => c.slug === 'electronics')!.id
         },
         {
             name: 'Uniqlo Ultra Light Down Jacket',
@@ -217,7 +221,7 @@ async function main() {
             images: ['/images/products/uniqlo-ultra-light-down-1.jpg', '/images/products/uniqlo-ultra-light-down-2.jpg'],
             stock: 90,
             featured: true,
-            categoryId: categories.find((c: Product) => c.slug === 'clothing')!.id
+            categoryId: categories.find(c => c.slug === 'clothing')!.id
         },
         {
             name: 'OnePlus 12',
@@ -228,7 +232,7 @@ async function main() {
             images: ['/images/products/oneplus-12-1.jpg', '/images/products/oneplus-12-2.jpg'],
             stock: 60,
             featured: false,
-            categoryId: categories.find((c: Product) => c.slug === 'smartphones')!.id
+            categoryId: categories.find(c => c.slug === 'smartphones')!.id
         }
     ]
 

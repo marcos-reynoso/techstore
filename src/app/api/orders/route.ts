@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
-import { Prisma, OrderStatus } from '@prisma/client'
+import { Prisma, OrderStatus } from '@/generated/prisma/client'
 import { logger } from '@/lib/logger'
 
 const OrderItemSchema = z.object({

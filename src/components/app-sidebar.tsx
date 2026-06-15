@@ -56,6 +56,14 @@ const data = {
           title: "All Categories",
           url: "/categories",
         },
+         {
+          title: "Clothing",
+          url: "/products?category=clothing",
+        },
+        {
+          title: "Electronics",
+          url: "/products?category=electronics",
+        },
         {
           title: "Laptops",
           url: "/products?category=laptops",
@@ -63,11 +71,7 @@ const data = {
         {
           title: "Smartphones",
           url: "/products?category=smartphones",
-        },
-        {
-          title: "Clothing",
-          url: "/products?category=clothing",
-        },
+        },       
       ],
     },
 

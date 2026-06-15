@@ -1,11 +1,12 @@
 # 🛒 TechStore
 
-> E-commerce de productos tecnológicos construido con Next.js 14, TypeScript y Prisma.
+> E-commerce de productos tecnológicos construido con Next.js 15, TypeScript y Prisma.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)
+![Vitest](https://img.shields.io/badge/Vitest-testing-6E9F18?style=flat-square&logo=vitest)
 
 ---
 
@@ -31,6 +32,7 @@ El proyecto fue construido con foco en arquitectura escalable, validación robus
 - 🛠️ **API REST completa** — endpoints para productos, categorías, órdenes y usuarios
 - ⏳ **Loading states** — skeletons y estados de carga para mejor UX
 - 🔒 **Middleware de autenticación** — protección de rutas privadas
+- 🧪 **Test suite** — cobertura de componentes, stores y validaciones con Vitest
 
 ---
 
@@ -38,7 +40,7 @@ El proyecto fue construido con foco en arquitectura escalable, validación robus
 
 | Categoría | Tecnología |
 |-----------|-----------|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 15 (App Router) |
 | Lenguaje | TypeScript |
 | Autenticación | NextAuth.js |
 | ORM | Prisma |
@@ -46,7 +48,35 @@ El proyecto fue construido con foco en arquitectura escalable, validación robus
 | Validación | Zod |
 | UI Components | shadcn/ui |
 | Estilos | Tailwind CSS |
+| Testing | Vitest + Testing Library |
 | Package manager | pnpm |
+
+---
+
+## 🧪 Testing
+
+El proyecto incluye una suite de tests con **Vitest** y **Testing Library** que cubre los flujos principales de la aplicación.
+
+### Correr los tests
+
+```bash
+# Correr todos los tests
+pnpm test
+
+# Modo watch
+pnpm test --watch
+
+# Con UI interactiva
+pnpm test:ui
+```
+
+### Cobertura
+
+| Área | Archivos testeados |
+|------|--------------------|
+| Componentes | Register, Login, Wishlist, Cart, SearchForm, Checkout |
+| Stores (Zustand) | cart-store, orders-store, product-store, user-store |
+| Validaciones (Zod) | registerSchema, loginSchema, updateProfileSchema |
 
 ---
 
@@ -73,7 +103,9 @@ cp .env.example .env
 # Completar las variables en el archivo .env
 
 # 4. Generar el cliente de Prisma y migrar la base de datos
-npx prisma migrate dev
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
 
 # 5. Correr el servidor de desarrollo
 pnpm dev
@@ -106,6 +138,17 @@ src/
 │   ├── track/                # Seguimiento de pedidos
 │   ├── wishlist/             # Lista de deseos
 │   └── page.tsx              # Home
+├── __tests__/                # Suite de tests
+│   ├── cart-store.test.ts
+│   ├── Checkout.test.tsx
+│   ├── Login.test.tsx
+│   ├── Orders-store.test.ts
+│   ├── Product-store.test.ts
+│   ├── Register.test.tsx
+│   ├── SearchForm.test.tsx
+│   ├── User-store.test.ts
+│   ├── Wishlist.test.tsx
+│   └── Zod-validations.test.ts
 ├── components/
 │   ├── products/             # Componentes de producto (card, grid, detalle)
 │   ├── ui/                   # Componentes base (shadcn/ui)
@@ -126,5 +169,3 @@ src/
 ├── types/                    # Tipos TypeScript globales
 └── middleware.ts             # Middleware de protección de rutas
 ```
-
----

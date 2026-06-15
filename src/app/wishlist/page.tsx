@@ -10,15 +10,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useCartStore } from "@/store/cart-store"
+import { WishlistItem } from "@/types/index"
 
-interface WishlistItem {
-    id: string
-    name: string
-    slug: string
-    price: number
-    image: string
-    stock: number
-}
+
 
 export default function WishlistPage() {
     const { data: session, status } = useSession()

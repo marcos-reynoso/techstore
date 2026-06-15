@@ -1,8 +1,8 @@
-ignoredBuiltDependencies:
-  - '@prisma/client'
-  - '@prisma/engines'
-  - esbuild
-  - prisma
-  - sharp
+# minimumReleaseAge: 1440;
 
-minimumReleaseAge: 1440;
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
+minimumReleaseAgeExclude:
+  - lucide-react@1.18.0
