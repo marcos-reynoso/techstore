@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { OrderStatus, OrderSummary } from "@/store/orders-store"
@@ -24,7 +24,7 @@ export default function TrackPage() {
         if (!session) router.replace("/login")
     }, [session, sessionStatus, router])
 
-    async function loadOrders(nextPage: number, mode: "replace" | "append") {
+    const loadOrders = useCallback(async (nextPage: number, mode: "replace" | "append") => {
         if (!session?.user?.id) return
         setError(null)
         setIsLoadingList(true)
@@ -52,7 +52,7 @@ export default function TrackPage() {
         } finally {
             setIsLoadingList(false)
         }
-    }
+    }, [limit, session?.user?.id])
 
     async function loadSelectedOrder(orderNumber: string) {
         setError(null)
@@ -82,8 +82,7 @@ export default function TrackPage() {
     useEffect(() => {
         if (!session?.user?.id) return
         loadOrders(1, "replace")
-
-    }, [session?.user?.id])
+    }, [loadOrders, session?.user?.id])
 
     const tracking = useMemo(() => {
         const status = order?.status ?? null

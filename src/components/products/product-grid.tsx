@@ -20,6 +20,7 @@ interface ProductGridProps {
     currentPage: number
     hasNextPage: boolean
     hasPrevPage: boolean
+    query?: Record<string, string | number | undefined>
 }
 
 
@@ -29,6 +30,7 @@ export function ProductGrid({
   currentPage,
   hasNextPage,
   hasPrevPage,
+  query,
 }: ProductGridProps) {
 
   if (products.length === 0) {
@@ -67,7 +69,7 @@ export function ProductGrid({
             <PaginationContent>
               {hasPrevPage && (
                 <PaginationItem>
-                  <PaginationPrevious href={`?page=${currentPage - 1}`} />
+                  <PaginationPrevious href={buildPageHref(currentPage - 1, query)} />
                 </PaginationItem>
               )}
               
@@ -79,7 +81,7 @@ export function ProductGrid({
                 ) : (
                   <PaginationItem key={page}>
                     <PaginationLink 
-                      href={`?page=${page}`}
+                      href={buildPageHref(page as number, query)}
                       isActive={page === currentPage}
                     >
                       {page}
@@ -90,7 +92,7 @@ export function ProductGrid({
               
               {hasNextPage && (
                 <PaginationItem>
-                  <PaginationNext href={`?page=${currentPage + 1}`} />
+                  <PaginationNext href={buildPageHref(currentPage + 1, query)} />
                 </PaginationItem>
               )}
             </PaginationContent>
@@ -127,6 +129,22 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | stri
   return pages
 }
 
+function buildPageHref(page: number, query?: Record<string, string | number | undefined>) {
+  const params = new URLSearchParams()
+
+  params.set("page", String(page))
+
+  Object.entries(query ?? {}).forEach(([key, value]) => {
+    if (key === "page" || value === undefined || value === null || value === "") {
+      return
+    }
+
+    params.set(key, String(value))
+  })
+
+  const qs = params.toString()
+  return qs ? `?${qs}` : "?page=1"
+}
 
 
 

@@ -66,8 +66,7 @@ pnpm test
 # Modo watch
 pnpm test --watch
 
-# Con UI interactiva
-pnpm test:ui
+
 ```
 
 ### Cobertura

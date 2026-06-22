@@ -66,7 +66,7 @@ describe('RegisterPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }))
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Validation failed')
+      expect(toast.error).toHaveBeenCalledWith('Password must be at least 8 characters')
     })
   })
 
@@ -76,7 +76,7 @@ describe('RegisterPage', () => {
       json: async () => ({}),
     })
 
-    vi.mocked(signIn).mockResolvedValue({ error: null, ok: true, status: 200, url: '' } as any)
+    vi.mocked(signIn).mockResolvedValue({ error: null, ok: true, status: 200, url: '' } as unknown as Awaited<ReturnType<typeof signIn>>)
 
     render(<RegisterPage />)
 

@@ -6,7 +6,6 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Sparkles,
   LogIn,
   UserPlus,
 } from "lucide-react"

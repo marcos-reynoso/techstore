@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import Wishlist from "@/app/wishlist/page"
 import { useSession } from "next-auth/react"
-import { redirect } from 'next/navigation'
+import { loadWishlist, removeWishlistItem } from "@/lib/wishlist"
 
 vi.mock("next-auth/react", () => ({
     useSession: vi.fn(() => ({
@@ -28,6 +28,11 @@ vi.mock('@/store/cart-store', () => ({
     })),
 }))
 
+vi.mock('@/lib/wishlist', () => ({
+    loadWishlist: vi.fn(),
+    removeWishlistItem: vi.fn(),
+}))
+
 const localStorageMock = {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -35,45 +40,54 @@ const localStorageMock = {
     clear: vi.fn(),
 }
 
-global.localStorage = localStorageMock as any
+Object.defineProperty(globalThis, 'localStorage', {
+    value: localStorageMock,
+    writable: true,
+})
 
 describe("Wishlist", () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        localStorageMock.getItem.mockReturnValue(null)
+        vi.mocked(loadWishlist).mockResolvedValue([])
+        vi.mocked(removeWishlistItem).mockResolvedValue([])
     })
 
-   it("should render the wishlist page", () => {
-    vi.mocked(useSession).mockReturnValue({
-        data: {
-            expires: "2025-10-12T00:00:00.000Z",
-            user: {
-                id: "1",
-                name: "John Doe",
-                email: "john@example.com",
-                role: "user",
-                avatar: "https://via.placeholder.com/150",
+   it("should render the wishlist page", async () => {
+        vi.mocked(useSession).mockReturnValue({
+            data: {
+                expires: "2025-10-12T00:00:00.000Z",
+                user: {
+                    id: "1",
+                    name: "John Doe",
+                    email: "john@example.com",
+                    role: "user",
+                    avatar: "https://via.placeholder.com/150",
+                },
             },
-        },
-        status: "authenticated",
-        update: vi.fn(),
+            status: "authenticated",
+            update: vi.fn(),
+        })
+
+        vi.mocked(loadWishlist).mockResolvedValue([
+            {
+                id: "1",
+                name: "Product 1",
+                slug: "product-1",
+                price: 100,
+                image: "https://via.placeholder.com/150",
+                stock: 10,
+            },
+        ])
+
+        render(<Wishlist />)
+
+        await waitFor(() => {
+            expect(screen.getByText("My saved products")).toBeInTheDocument()
+            expect(screen.getByText(/1 item saved for later/i)).toBeInTheDocument()
+        })
     })
-    
-    localStorageMock.getItem.mockReturnValue(JSON.stringify([
-        {
-            id: "1",
-            name: "Product 1",
-            slug: "product-1",
-            price: 100,
-            image: "https://via.placeholder.com/150",
-            stock: 10,
-        }
-    ]))
-    
-    render(<Wishlist />)
-    expect(screen.getByText("My Wishlist")).toBeInTheDocument()
-})
-    it ("wishlist should be empty", () => {
+
+    it("wishlist should be empty", () => {
         vi.mocked(useSession).mockReturnValue({
             data: {
                 expires: "2025-10-12T00:00:00.000Z",
@@ -90,11 +104,11 @@ describe("Wishlist", () => {
         })
         render(<Wishlist />)
         expect(screen.getByText("Your wishlist is empty")).toBeInTheDocument()
-        expect(screen.getByText("Save items you love for later")).toBeInTheDocument()
+        expect(screen.getByText(/save products you like/i)).toBeInTheDocument()
         expect(screen.getByText("Browse Products")).toBeInTheDocument()
     })
-    
-    it ("should show items in wishlist", () => {
+
+    it("should show items in wishlist", async () => {
         vi.mocked(useSession).mockReturnValue({
             data: {
                 expires: "2025-10-12T00:00:00.000Z",
@@ -110,7 +124,7 @@ describe("Wishlist", () => {
             update: vi.fn(),
         })
         
-        localStorageMock.getItem.mockReturnValue(JSON.stringify([
+        vi.mocked(loadWishlist).mockResolvedValue([
             {
                 id: "1",
                 name: "Product 1",
@@ -119,50 +133,53 @@ describe("Wishlist", () => {
                 image: "https://via.placeholder.com/150",
                 stock: 10,
             }
-        ]))
+        ])
         
         render(<Wishlist />)
-        expect(screen.getByText("My Wishlist")).toBeInTheDocument()
-        expect(screen.getByText("1 item saved")).toBeInTheDocument()
-        expect(screen.getByText("Product 1")).toBeInTheDocument()
-        expect(screen.getByText("$100.00")).toBeInTheDocument()
-        expect(screen.getByRole("button", { name: "Add to Cart" })).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText("My saved products")).toBeInTheDocument()
+            expect(screen.getByText(/1 item saved for later/i)).toBeInTheDocument()
+            expect(screen.getByText("Product 1")).toBeInTheDocument()
+            expect(screen.getByText("$100.00")).toBeInTheDocument()
+            expect(screen.getByRole("button", { name: "Add to Cart" })).toBeInTheDocument()
+        })
     })
 
-   it ("should remove item from wishlist", () => {
-    vi.mocked(useSession).mockReturnValue({
-        data: {
-            expires: "2025-10-12T00:00:00.000Z",
-            user: {
-                id: "1",
-                name: "John Doe",
-                email: "john@example.com",
-                role: "user",
-                avatar: "https://via.placeholder.com/150",
+    it("should remove item from wishlist", async () => {
+        vi.mocked(useSession).mockReturnValue({
+            data: {
+                expires: "2025-10-12T00:00:00.000Z",
+                user: {
+                    id: "1",
+                    name: "John Doe",
+                    email: "john@example.com",
+                    role: "user",
+                    avatar: "https://via.placeholder.com/150",
+                },
             },
-        },
-        status: "authenticated",
-        update: vi.fn(),
+            status: "authenticated",
+            update: vi.fn(),
+        })
+
+        vi.mocked(loadWishlist).mockResolvedValue([
+            {
+                id: "1",
+                name: "Product 1",
+                slug: "product-1",
+                price: 100,
+                image: "https://via.placeholder.com/150",
+                stock: 10,
+            },
+        ])
+
+        render(<Wishlist />)
+        await waitFor(() => {
+            expect(screen.getByText("My saved products")).toBeInTheDocument()
+            expect(screen.getByText(/1 item saved for later/i)).toBeInTheDocument()
+            expect(screen.getByText("Product 1")).toBeInTheDocument()
+            expect(screen.getByText("$100.00")).toBeInTheDocument()
+        })
+
+        expect(screen.getAllByRole("button").length).toBeGreaterThan(1)
     })
-    
-    localStorageMock.getItem.mockReturnValue(JSON.stringify([
-        {
-            id: "1",
-            name: "Product 1",
-            slug: "product-1",
-            price: 100,
-            image: "https://via.placeholder.com/150",
-            stock: 10,
-        }
-    ]))
-    
-    render(<Wishlist />)
-    expect(screen.getByText("My Wishlist")).toBeInTheDocument()
-    expect(screen.getByText("1 item saved")).toBeInTheDocument()
-    expect(screen.getByText("Product 1")).toBeInTheDocument()
-    expect(screen.getByText("$100.00")).toBeInTheDocument()
-    
-    const deleteButton = document.querySelector('button .lucide-trash-2')
-    expect(deleteButton).toBeInTheDocument()
-})
 })

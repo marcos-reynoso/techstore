@@ -1,7 +1,7 @@
 "use client"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
-import { useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -26,11 +26,15 @@ export default function OrdersPage() {
         cancelOrder,
     } = useOrdersStore()
 
-    useEffect(() => {
+    const refreshOrders = useCallback(() => {
         if (status === "authenticated" && userId) {
             loadOrders({ userId, page: 1, limit: 10 })
         }
-    }, [status, userId])
+    }, [loadOrders, status, userId])
+
+    useEffect(() => {
+        refreshOrders()
+    }, [refreshOrders])
 
     if (status === "loading") {
         return (
@@ -181,4 +185,3 @@ export default function OrdersPage() {
         </div>
     )
 }
-

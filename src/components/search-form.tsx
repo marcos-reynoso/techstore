@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Search } from "lucide-react"
 
 import { Label } from "@/components/ui/label"
@@ -14,6 +15,10 @@ type SearchProduct = {
   image: string
   category?: { id: string; name: string; slug: string }
 }
+
+type SearchResponse =
+  | { products: SearchProduct[] }
+  | { error: string }
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value)
@@ -38,7 +43,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const [items, setItems] = useState<SearchProduct[]>([])
   const [error, setError] = useState<string | null>(null)
 
-  const trimmed = useMemo(() => query.trim(), [query])
+  const trimmed = query.trim()
 
   useEffect(() => {
     async function run() {
@@ -56,15 +61,15 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&limit=8`, {
           cache: "no-store",
         })
-        const data = await res.json().catch(() => ({}))
+        const data = (await res.json().catch(() => ({}))) as Partial<SearchResponse>
 
         if (!res.ok) {
-          setError((data as any)?.error || "Search failed")
+          setError("error" in data ? data.error ?? "Search failed" : "Search failed")
           setItems([])
           return
         }
 
-        setItems(((data as any)?.products ?? []) as SearchProduct[])
+        setItems("products" in data && Array.isArray(data.products) ? data.products : [])
       } catch {
         setError("Network error")
         setItems([])
@@ -145,11 +150,13 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
                     className="w-full text-left px-3 py-2 hover:bg-muted"
                   >
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={p.image}
                         alt={p.name}
                         className="h-9 w-9 rounded object-cover border"
                         loading="lazy"
+                        width={36}
+                        height={36}
                       />
                       <div className="min-w-0">
                         <div className="text-sm font-medium truncate">{p.name}</div>

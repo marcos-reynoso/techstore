@@ -11,10 +11,10 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { updateProfileSchema } from "@/lib/validations/auth"
-import { z } from "zod"
-import { ArrowLeft, Upload, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import type { ProfileUpdateData } from "@/types"
+import { getZodMessage } from "@/lib/zod"
 
 export default function SettingsPage() {
     const { data: session, status, update } = useSession()
@@ -104,11 +104,7 @@ export default function SettingsPage() {
 
             router.push("/profile")
         } catch (error) {
-            if (error instanceof z.ZodError) {
-                toast.error(error.message)
-            } else {
-                toast.error("Something went wrong")
-            }
+            toast.error(getZodMessage(error, "Something went wrong"))
         } finally {
             setIsLoading(false)
         }
@@ -151,7 +147,7 @@ export default function SettingsPage() {
 
             setFormData(prev => ({ ...prev, avatar: data.url }))
             toast.success('Image uploaded successfully!')
-        } catch (error) {
+        } catch {
             toast.error('Failed to upload image')
         } finally {
             setIsUploadingAvatar(false)
@@ -248,7 +244,7 @@ export default function SettingsPage() {
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Change Password</h3>
                             <p className="text-sm text-muted-foreground">
-                                Leave empty if you don't want to change your password
+                                Leave empty if you don&apos;t want to change your password
                             </p>
 
                             <div className="space-y-2">

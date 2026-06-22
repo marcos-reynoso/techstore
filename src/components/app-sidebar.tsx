@@ -6,7 +6,6 @@ import {
   ShoppingBag,
   Package,
   Grid3X3,
-  Users,
   ShoppingCart,
   Heart,
   LifeBuoy,
@@ -27,6 +26,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useCartStore } from "@/store/cart-store"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 const data = {
 
@@ -105,6 +105,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
   const { data: session } = useSession()
   const totalItems = useCartStore(state => state.totalItems)
 
@@ -128,6 +129,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         : item
     ), [totalItems]
   )
+
+  if (pathname === "/login" || pathname === "/register") {
+    return null
+  }
 
   return (
     <Sidebar

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
 import CheckoutPage from '../app/checkout/page'
 import { useCartStore } from '../store/cart-store'
@@ -25,32 +26,37 @@ vi.mock('sonner', () => ({
 }))
 
 vi.mock('next/image', () => ({
-    default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
+    default: ({ src, alt }: { src: string; alt: string }) => <div data-src={src} aria-label={alt} />,
 }))
 
 vi.mock('next/link', () => ({
     default: ({ href, children }: { href: string; children: React.ReactNode }) => <a href={href}>{children}</a>,
 }))
 
+type MockChildrenProps = { children?: ReactNode }
+type MockButtonProps = MockChildrenProps & { disabled?: boolean; type?: 'button' | 'submit'; asChild?: boolean }
+type MockInputProps = React.InputHTMLAttributes<HTMLInputElement>
+type MockLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>
+
 vi.mock('@/components/ui/card', () => ({
-    Card: ({ children }: any) => <div>{children}</div>,
-    CardHeader: ({ children }: any) => <div>{children}</div>,
-    CardTitle: ({ children }: any) => <div>{children}</div>,
-    CardContent: ({ children }: any) => <div>{children}</div>,
-    CardFooter: ({ children }: any) => <div>{children}</div>,
+    Card: ({ children }: MockChildrenProps) => <div>{children}</div>,
+    CardHeader: ({ children }: MockChildrenProps) => <div>{children}</div>,
+    CardTitle: ({ children }: MockChildrenProps) => <div>{children}</div>,
+    CardContent: ({ children }: MockChildrenProps) => <div>{children}</div>,
+    CardFooter: ({ children }: MockChildrenProps) => <div>{children}</div>,
 }))
 
 vi.mock('@/components/ui/button', () => ({
-    Button: ({ children, disabled, type, asChild }: any) =>
+    Button: ({ children, disabled, type, asChild }: MockButtonProps) =>
         asChild ? <>{children}</> : <button type={type} disabled={disabled}>{children}</button>,
 }))
 
 vi.mock('@/components/ui/input', () => ({
-    Input: (props: any) => <input {...props} />,
+    Input: (props: MockInputProps) => <input {...props} />,
 }))
 
 vi.mock('@/components/ui/label', () => ({
-    Label: ({ children, htmlFor }: any) => <label htmlFor={htmlFor}>{children}</label>,
+    Label: ({ children, htmlFor }: MockLabelProps) => <label htmlFor={htmlFor}>{children}</label>,
 }))
 
 vi.mock('@/components/ui/separator', () => ({
@@ -75,7 +81,7 @@ describe('CheckoutPage', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
-        vi.mocked(useSession).mockReturnValue({ data: mockSession, status: 'authenticated' } as any)
+        vi.mocked(useSession).mockReturnValue({ data: mockSession, status: 'authenticated' } as unknown as ReturnType<typeof useSession>)
 
         useCartStore.setState({
             items: mockCartItems,
@@ -87,7 +93,7 @@ describe('CheckoutPage', () => {
             isLoading: false,
             error: null,
             createOrder: vi.fn().mockResolvedValue(null),
-        } as any)
+        } as Parameters<typeof useOrdersStore.setState>[0])
     })
 
     it('should render shipping form and order summary', () => {
@@ -139,7 +145,7 @@ describe('CheckoutPage', () => {
     })
 
     it('should show loading state when status is loading', () => {
-        vi.mocked(useSession).mockReturnValue({ data: null, status: 'loading' } as any)
+        vi.mocked(useSession).mockReturnValue({ data: null, status: 'loading' } as unknown as ReturnType<typeof useSession>)
 
         render(<CheckoutPage />)
         expect(screen.getByText('Loading...')).toBeInTheDocument()
@@ -154,7 +160,7 @@ describe('CheckoutPage', () => {
         fireEvent.submit(screen.getByRole('button', { name: 'Place Order' }).closest('form')!)
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Please complete all shipping fields')
+            expect(toast.error).toHaveBeenCalledWith('Please enter your address')
         })
     })
 
@@ -164,7 +170,7 @@ describe('CheckoutPage', () => {
             isLoading: false,
             error: null,
             createOrder: vi.fn().mockResolvedValue(mockOrder),
-        } as any)
+        } as Parameters<typeof useOrdersStore.setState>[0])
 
         render(<CheckoutPage />)
         fillShippingForm()
@@ -181,7 +187,7 @@ describe('CheckoutPage', () => {
             isLoading: false,
             error: 'Failed to create order',
             createOrder: vi.fn().mockResolvedValue(null),
-        } as any)
+        } as Parameters<typeof useOrdersStore.setState>[0])
 
         render(<CheckoutPage />)
         fillShippingForm()
@@ -193,7 +199,7 @@ describe('CheckoutPage', () => {
     })
 
     it('should disable button while order is loading', () => {
-        useOrdersStore.setState({ isLoading: true } as any)
+        useOrdersStore.setState({ isLoading: true } as Parameters<typeof useOrdersStore.setState>[0])
 
         render(<CheckoutPage />)
         expect(screen.getByRole('button', { name: 'Placing order...' })).toBeDisabled()

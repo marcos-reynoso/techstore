@@ -28,7 +28,8 @@ describe('User Store', () => {
     })
 
     it('should set user without avatar', () => {
-        const { avatar, ...userWithoutAvatar } = mockUser
+        const userWithoutAvatar = { ...mockUser }
+        delete userWithoutAvatar.avatar
         useUserStore.getState().setUser(userWithoutAvatar)
 
         expect(useUserStore.getState().user?.avatar).toBeUndefined()

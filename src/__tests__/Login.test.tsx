@@ -44,7 +44,7 @@ describe('LoginPage', () => {
   })
 
   it('should redirect on successful login', async () => {
-    vi.mocked(signIn).mockResolvedValue({ error: null, ok: true, status: 200, url: '' } as any)
+    vi.mocked(signIn).mockResolvedValue({ error: null, ok: true, status: 200, url: '' } as unknown as Awaited<ReturnType<typeof signIn>>)
 
     render(<LoginPage />)
 

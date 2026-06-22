@@ -1,6 +1,7 @@
 "use client"
 
 import { SidebarIcon } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 import { SearchForm } from "@/components/search-form"
 
@@ -9,7 +10,12 @@ import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 
 export function SiteHeader() {
+  const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
+
+  if (pathname === "/login" || pathname === "/register") {
+    return null
+  }
 
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b">
