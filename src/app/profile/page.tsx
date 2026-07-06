@@ -35,17 +35,18 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-4">
-            <div>
-                <h1 className="text-3xl font-bold">My Profile</h1>
-                <p className="text-muted-foreground">Manage your account information</p>
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:py-8">
+            <div className="rounded-4xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(0,0,0,0.16)] backdrop-blur">
+                <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Profile</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight">My Profile</h1>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">Manage your account information</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="border-white/10 bg-white/5 shadow-[0_16px_50px_rgba(0,0,0,0.16)] backdrop-blur">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <User className="h-5 w-5" />
+                            <User className="h-5 w-5 text-cyan-300" />
                             Account Information
                         </CardTitle>
                         <CardDescription>Your personal details</CardDescription>
@@ -66,23 +67,23 @@ export default function ProfilePage() {
                                 </p>
                             </div>
                         </div>
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
 
                         <div>
                             <p className="text-sm text-muted-foreground">Name</p>
                             <p className="font-medium">{session.user?.name || "Not set"}</p>
                         </div>
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
 
                         <div>
                             <p className="text-sm text-muted-foreground">Email</p>
                             <p className="font-medium">{session.user?.email}</p>
                         </div>
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
-                        <Button asChild className="w-full">
+                        <Button asChild className="w-full rounded-full">
                             <Link href="/profile/settings">
                                 <Settings className="h-4 w-4 mr-2" />
                                 Edit Profile
@@ -91,25 +92,25 @@ export default function ProfilePage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-white/10 bg-white/5 shadow-[0_16px_50px_rgba(0,0,0,0.16)] backdrop-blur">
                     <CardHeader>
                         <CardTitle>Quick Actions</CardTitle>
                         <CardDescription>Access your account features</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Button asChild variant="outline" className="w-full justify-start">
+                        <Button asChild variant="outline" className="w-full justify-start rounded-full border-white/10 bg-white/5">
                             <Link href="/profile/orders">
                                 <ShoppingBag className="h-4 w-4 mr-2" />
                                 My Orders
                             </Link>
                         </Button>
-                        <Button asChild variant="outline" className="w-full justify-start">
+                        <Button asChild variant="outline" className="w-full justify-start rounded-full border-white/10 bg-white/5">
                             <Link href="/wishlist">
                                 <Heart className="h-4 w-4 mr-2" />
                                 My Wishlist
                             </Link>
                         </Button>
-                        <Button asChild variant="outline" className="w-full justify-start">
+                        <Button asChild variant="outline" className="w-full justify-start rounded-full border-white/10 bg-white/5">
                             <Link href="/cart">
                                 <ShoppingBag className="h-4 w-4 mr-2" />
                                 Shopping Cart

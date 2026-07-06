@@ -78,15 +78,16 @@ export default function OrdersPage() {
     const formatMoney = (n: number) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n)
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-4">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">My Orders</h1>
-                    <p className="text-muted-foreground">Manage and track your orders</p>
-                </div>
-                <div className="flex items-center gap-3">
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:py-8">
+            <div className="rounded-4xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(0,0,0,0.16)] backdrop-blur">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Orders</p>
+                        <h1 className="mt-2 text-3xl font-semibold tracking-tight">My Orders</h1>
+                        <p className="mt-3 text-sm leading-7 text-muted-foreground">Manage and track your orders</p>
+                    </div>
                     <Select value={(filters.status ?? 'all').toString()} onValueChange={onChangeStatus}>
-                        <SelectTrigger className="w-40">
+                        <SelectTrigger className="w-40 rounded-full border-white/10 bg-white/5">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -102,21 +103,21 @@ export default function OrdersPage() {
             </div>
 
             {isLoading && (
-                <div className="rounded-md border p-4 text-sm text-muted-foreground">Loading orders...</div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground backdrop-blur">Loading orders...</div>
             )}
             {error && !isLoading && (
-                <div className="rounded-md border p-4 text-sm text-destructive">{error}</div>
+                <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-400 backdrop-blur">{error}</div>
             )}
 
             {!isLoading && orders.length === 0 && !error && (
-                <div className="rounded-md border p-6 text-center">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur">
                     <p className="text-muted-foreground">You have no orders yet.</p>
                 </div>
             )}
 
             <div className="grid gap-4">
                 {orders.map((order) => (
-                    <Card key={order.id}>
+                    <Card key={order.id} className="border-white/10 bg-white/5 shadow-[0_16px_50px_rgba(0,0,0,0.16)] backdrop-blur">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0">
                             <div className="space-y-1">
                                 <CardTitle className="text-lg">{order.orderNumber}</CardTitle>
@@ -128,7 +129,7 @@ export default function OrdersPage() {
                                 </Badge>
                                 <div className="font-medium">{formatMoney(order.total)}</div>
                                 {order.status === OrderStatus.PENDING && (
-                                    <Button variant="outline" size="sm" onClick={() => handleCancel(order.id)}>
+                                    <Button variant="outline" size="sm" onClick={() => handleCancel(order.id)} className="rounded-full border-white/10 bg-white/5">
                                         Cancel
                                     </Button>
                                 )}
@@ -140,9 +141,9 @@ export default function OrdersPage() {
                             </div>
                             <div className="flex flex-col gap-3">
                                 {order.orderItems.map(item => (
-                                    <div key={item.id} className="flex items-center gap-3">
+                                    <div key={item.id} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/10 p-3">
                                         {item.product?.image && (
-                                            <Image src={item.product.image} alt={item.product.name} width={56} height={56} className="h-14 w-14 rounded object-cover" />
+                                            <Image src={item.product.image} alt={item.product.name} width={56} height={56} className="h-14 w-14 rounded-2xl object-cover" />
                                         )}
                                         <div className="flex-1">
                                             <div className="font-medium line-clamp-1">{item.product?.name}</div>
@@ -168,6 +169,7 @@ export default function OrdersPage() {
                             size="sm"
                             disabled={pagination.page <= 1 || isLoading}
                             onClick={() => onChangePage(pagination.page - 1)}
+                            className="rounded-full border-white/10 bg-white/5"
                         >
                             Previous
                         </Button>
@@ -176,6 +178,7 @@ export default function OrdersPage() {
                             size="sm"
                             disabled={pagination.page >= Math.max(1, pagination.totalPages) || isLoading}
                             onClick={() => onChangePage(pagination.page + 1)}
+                            className="rounded-full border-white/10 bg-white/5"
                         >
                             Next
                         </Button>

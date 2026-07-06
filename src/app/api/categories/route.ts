@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
+import { auth } from '@/lib/auth'
 
 const CategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -35,6 +36,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    if (!session?.user || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const validatedData = CategorySchema.parse(body)
 

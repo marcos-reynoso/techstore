@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { Prisma, OrderStatus } from '@/generated/prisma/client'
 import { logger } from '@/lib/logger'
+import { auth } from '@/lib/auth'
 
 const OrderItemSchema = z.object({
   productId: z.string(),
@@ -76,8 +77,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const validatedData = OrderSchema.parse(body)
+
+    if (validatedData.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
 
 
     const total = validatedData.items.reduce(

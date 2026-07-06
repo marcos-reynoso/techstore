@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
+import { put } from '@vercel/blob'
 import { logger } from '@/lib/logger'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
 const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
-
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-}
 
 export async function POST(request: NextRequest) {
     try {
@@ -47,28 +39,20 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const uploadDir = path.join(process.cwd(), 'public', 'avatars')
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true })
-        }
         const timestamp = Date.now()
         const randomString = Math.random().toString(36).substring(2, 15)
         const extension = file.name.split('.').pop() || 'jpg'
-        const fileName = `avatar-${timestamp}-${randomString}.${extension}`
+        const fileName = `avatars/avatar-${timestamp}-${randomString}.${extension}`
 
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
-        const filePath = path.join(uploadDir, fileName)
+        const blob = await put(fileName, file, {
+            access: 'public',
+        })
 
-        await writeFile(filePath, buffer)
-
-        const publicUrl = `/avatars/${fileName}`
-
-        logger.info(`Avatar uploaded successfully: ${publicUrl}`)
+        logger.info(`Avatar uploaded successfully: ${blob.url}`)
 
         return NextResponse.json({
             message: 'File uploaded successfully',
-            url: publicUrl
+            url: blob.url
         }, { status: 201 })
 
     } catch (error) {

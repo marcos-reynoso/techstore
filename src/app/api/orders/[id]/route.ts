@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
+import { auth } from '@/lib/auth'
 
 
 const OrderUpdateSchema = z.object({
@@ -59,6 +60,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const resolvedParams = await params
     const body = await request.json()
     const validatedData = OrderUpdateSchema.parse(body)
@@ -71,6 +80,13 @@ export async function PUT(
       return NextResponse.json(
         { error: 'Order not found' },
         { status: 404 }
+      )
+    }
+
+    if (existingOrder.userId !== session.user.id && session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
@@ -111,6 +127,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const resolvedParams = await params
     const order = await prisma.order.findUnique({
       where: { id: resolvedParams.id },
@@ -121,6 +145,13 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Order not found' },
         { status: 404 }
+      )
+    }
+
+    if (order.userId !== session.user.id && session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 

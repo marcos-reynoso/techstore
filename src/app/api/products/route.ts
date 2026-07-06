@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { logger } from '@/lib/logger'
 import { z } from 'zod'
 import { getCatalogProducts } from '@/lib/catalog'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 
 const ProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -54,6 +56,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    if (!session?.user || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
 
 

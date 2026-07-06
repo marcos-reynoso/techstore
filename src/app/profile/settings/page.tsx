@@ -165,21 +165,22 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-4">
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:py-8">
             <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
+                <Button variant="ghost" size="icon" asChild className="rounded-full">
                     <Link href="/profile">
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <div>
-                    <h1 className="text-3xl font-bold">Profile Settings</h1>
-                    <p className="text-muted-foreground">Update your account information</p>
+                <div className="rounded-4xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(0,0,0,0.16)] backdrop-blur flex-1">
+                    <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Settings</p>
+                    <h1 className="mt-2 text-3xl font-semibold tracking-tight">Profile Settings</h1>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">Update your account information</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit}>
-                <Card>
+                <Card className="border-white/10 bg-white/5 shadow-[0_16px_50px_rgba(0,0,0,0.16)] backdrop-blur">
                     <CardHeader>
                         <CardTitle>Personal Information</CardTitle>
                         <CardDescription>Update your profile details and avatar</CardDescription>
@@ -215,7 +216,7 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
@@ -239,7 +240,7 @@ export default function SettingsPage() {
                             />
                         </div>
 
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Change Password</h3>
@@ -270,13 +271,13 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="bg-white/10" />
 
                         <div className="flex gap-4">
-                            <Button type="submit" disabled={isLoading} className="flex-1">
+                            <Button type="submit" disabled={isLoading} className="flex-1 rounded-full">
                                 {isLoading ? "Saving..." : "Save Changes"}
                             </Button>
-                            <Button type="button" variant="outline" asChild>
+                            <Button type="button" variant="outline" asChild className="rounded-full border-white/10 bg-white/5">
                                 <Link href="/profile">Cancel</Link>
                             </Button>
                         </div>
